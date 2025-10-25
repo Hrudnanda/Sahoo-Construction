@@ -1,4 +1,5 @@
 import React from "react";
+import photo from "../assets/my.jpg";
 import { motion, useAnimation } from "framer-motion";
 import { FaHardHat, FaPhoneAlt } from "react-icons/fa";
 
@@ -20,6 +21,7 @@ const gradientVariants = {
 
 const Home = () => {
   const controls = useAnimation();
+
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
       {/* Animated Gradient Background */}
@@ -36,7 +38,7 @@ const Home = () => {
         <div className="absolute inset-0 bg-black/40"></div>
       </motion.div>
 
-      {/* Main Content */}
+      {/* Main Section */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -70,7 +72,71 @@ const Home = () => {
         </motion.div>
       </div>
 
-      {/* Floating CTA */}
+      {/* Aim & Vision Section */}
+      <div className="relative z-10 py-20 bg-gradient-to-b from-black/80 to-yellow-900/30 text-center">
+        <h2 className="text-4xl font-bold mb-10 text-yellow-400">Our Aim & Vision</h2>
+        <div className="flex flex-col md:flex-row justify-center items-stretch gap-10 px-6 max-w-6xl mx-auto">
+          {/* Aim Card */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-black/70 backdrop-blur-md rounded-2xl p-8 shadow-lg border border-yellow-500 w-full md:w-1/2"
+          >
+            <h3 className="text-2xl font-semibold text-yellow-400 mb-4">Our Aim</h3>
+            <p className="text-gray-200 leading-relaxed">
+              Our primary goal is to deliver reliable and sustainable construction 
+              services that bring innovative design and superior craftsmanship to every project. 
+              We aim to create landmarks that inspire communities.
+            </p>
+          </motion.div>
+
+          {/* Vision Card */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-black/70 backdrop-blur-md rounded-2xl p-8 shadow-lg border border-yellow-500 w-full md:w-1/2"
+          >
+            <h3 className="text-2xl font-semibold text-yellow-400 mb-4">Our Vision</h3>
+            <p className="text-gray-200 leading-relaxed">
+              We envision becoming a globally trusted name in construction, 
+              known for innovation, sustainability, and a strong commitment to 
+              engineering excellence and customer satisfaction.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Engineer Photo Card with bottom 1/4 shadow */}
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          className="mt-20 flex justify-center"
+        >
+          <div className="relative group w-80 sm:w-96 md:w-[28rem] rounded-2xl overflow-hidden border border-yellow-500">
+            <img
+              src={photo}
+              alt="Engineer"
+              className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/20 to-transparent"></div>
+
+            {/* Bottom text */}
+            <div className="absolute bottom-5 left-0 right-0 text-center text-white px-4">
+              <h4 className="text-xl md:text-2xl font-bold text-yellow-400 drop-shadow-md">
+                Dedicated Engineers
+              </h4>
+              <p className="text-sm md:text-base text-gray-200 mt-2 drop-shadow-sm">
+                Committed to quality, safety, and innovation at every step.
+              </p>
+            </div>
+
+            {/* Bottom 1/4 shadow */}
+            <div className="absolute bottom-0 left-0 w-full h-1/4 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Floating Contact Button */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -90,3 +156,4 @@ const Home = () => {
 };
 
 export default Home;
+
