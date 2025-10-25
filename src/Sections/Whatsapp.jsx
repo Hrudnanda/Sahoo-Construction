@@ -1,31 +1,29 @@
-import React from "react";
-import { FaWhatsapp } from "react-icons/fa";
+// components/WhatsAppButton.jsx
 import { motion } from "framer-motion";
+import { FaWhatsapp } from "react-icons/fa";
 
-const Whatsapp = () => {
-  const phoneNumber = "YOUR_PHONE_NUMBER"; // Replace with your WhatsApp number
-  const message = "Hello! I want to chat with you."; // Optional message
-  const whatsappLink = `https://wa.me/${7847084654}?text=${encodeURIComponent(message)}`;
+const WhatsAppButton = () => {
+  const phoneNumber = "9040475287"; // Replace with your number (include country code)
+  const message = "Hello! I'm interested in your services."; // Optional default message
+
+  const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
   return (
     <motion.a
-      href={whatsappLink}
+    
+      href={whatsappURL}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
-      animate={{
-        y: [0, -10, 0], // Moves up 10px and back
-      }}
-      transition={{
-        duration: 2, // 2 seconds for one loop
-        repeat: Infinity, // Keep looping
-        repeatType: "loop",
-      }}
-      whileHover={{ scale: 1.2 }} // Slightly enlarge on hover
+      initial={{ opacity: 0, y: -25 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0 }}
+      whileHover={{ scale: 1.2 }}
+      className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
     >
-      <FaWhatsapp size={28} />
+      <FaWhatsapp className="text-2xl " />
+      
     </motion.a>
   );
 };
 
-export default Whatsapp;
+export default WhatsAppButton;
