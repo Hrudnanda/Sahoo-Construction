@@ -1,10 +1,19 @@
 import React from "react";
-import { FaPhone, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaHardHat, FaTools, FaWater } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 const Contact = () => {
+  const contactItems = [
+    { icon: <FaPhone />, title: "Call Us", info: "+91 98765 43210", color: "yellow-400" },
+    { icon: <FaEnvelope />, title: "Email", info: "info@civilconstruct.com", color: "green-400" },
+    { icon: <FaMapMarkerAlt />, title: "Location", info: "123 Main Street, City, State", color: "blue-400" },
+    { icon: <FaHardHat />, title: "Construction Safety", info: "Certified Safety Experts", color: "red-400" },
+    { icon: <FaTools />, title: "Quality Work", info: "Top-notch Construction Services", color: "purple-400" },
+    { icon: <FaWater />, title: "Plumbing Services", info: "Reliable Plumbing Solutions", color: "teal-400" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-pink-400 to-purple-500 p-6 md:p-16 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-red-800 to-black p-6 md:p-16 relative overflow-hidden">
       
       {/* Top CTA Button */}
       <motion.div
@@ -37,21 +46,22 @@ const Contact = () => {
           </p>
         </motion.div>
 
-        {/* Contact Info */}
+        {/* Contact & Services Cards */}
         <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { icon: <FaPhone />, title: "Call Us", info: "+91 98765 43210", color: "yellow-400" },
-            { icon: <FaEnvelope />, title: "Email", info: "info@civilconstruct.com", color: "green-400" },
-            { icon: <FaMapMarkerAlt />, title: "Location", info: "123 Main Street, City, State", color: "blue-400" },
-          ].map((item, index) => (
+          {contactItems.map((item, index) => (
             <motion.div
               key={index}
-              whileHover={{ scale: 1.05, rotate: 1 }}
-              className={`bg-white/90 backdrop-blur-md shadow-2xl rounded-xl p-6 flex flex-col items-center text-center border-l-4 border-${item.color} transition-transform`}
+              whileHover={{ scale: 1.08, y: -10, rotate: 1 }}
+              className={`relative group bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl p-8 flex flex-col items-center text-center transition-all hover:shadow-3xl`}
             >
-              <div className={`text-${item.color} text-4xl mb-4`}>{item.icon}</div>
-              <h3 className="font-bold text-lg text-gray-800">{item.title}</h3>
-              <p className="text-gray-700 mt-2">{item.info}</p>
+              {/* Colored circle behind icon */}
+              <div className={`w-20 h-20 flex items-center justify-center rounded-full mb-4 bg-gradient-to-br from-${item.color} to-${item.color}/70 text-white text-4xl transform transition-all group-hover:scale-110`}>
+                {item.icon}
+              </div>
+              <h3 className="font-bold text-lg text-white mb-2 drop-shadow-md">{item.title}</h3>
+              <p className="text-white/80">{item.info}</p>
+              {/* Floating glow effect */}
+              <span className={`absolute -bottom-4 w-24 h-1 bg-gradient-to-r from-${item.color} to-white opacity-40 rounded-full blur-xl`}></span>
             </motion.div>
           ))}
         </div>
@@ -61,7 +71,7 @@ const Contact = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="bg-white/90 backdrop-blur-md rounded-xl shadow-2xl p-8 max-w-3xl mx-auto"
+          className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8 max-w-3xl mx-auto"
         >
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
             Send Us a Message
@@ -104,5 +114,6 @@ const Contact = () => {
 };
 
 export default Contact;
+
 
 

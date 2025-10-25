@@ -5,6 +5,8 @@ import Home from './Sections/Home'
 import Experience from './Sections/Experience'
 import Service from './Sections/Service'
 import Contact from './Sections/Contact'
+import Works from './Sections/Works'
+import Whatsapp from './Sections/Whatsapp'
 
 const App = () => {
   return (
@@ -12,9 +14,10 @@ const App = () => {
       <Nav/>
       <Home/>
       <Service/>
+      <Works/>
       <Contact/>
-    
       <Experience/>
+      <Whatsapp/>
     </div>
   )
 }
