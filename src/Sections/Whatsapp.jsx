@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const Whatsapp = () => {
   const phoneNumber = "YOUR_PHONE_NUMBER"; // Replace with your WhatsApp number
   const message = "Hello! I want to chat with you."; // Optional message
-  const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  const whatsappLink = `https://wa.me/${7847084654}?text=${encodeURIComponent(message)}`;
 
   return (
     <motion.a
