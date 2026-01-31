@@ -3,7 +3,7 @@ import {
   Plus, Trash2, Download, FolderOpen, 
   Search, Building2, Save, X, Eye, Paperclip, 
   ArrowUpCircle, ArrowDownCircle, FileJson, FileSpreadsheet, 
-  FileDown, BarChart3, Calendar, FilePlus
+  FileDown, BarChart3, Calendar, Wallet
 } from "lucide-react";
 
 // PDF & Chart Libraries
@@ -72,6 +72,7 @@ export default function Home() {
   // --- CALCULATIONS ---
   const totalDebit = expenses.filter(e => e.type === 'debit').reduce((sum, e) => sum + Number(e.amount), 0);
   const totalCredit = expenses.filter(e => e.type === 'credit').reduce((sum, e) => sum + Number(e.amount), 0);
+  const totalRevenue = totalCredit - totalDebit;
 
   const chartData = useMemo(() => {
     const dataMap = expenses
@@ -103,7 +104,7 @@ export default function Home() {
     doc.setTextColor(0);
     doc.text(`Total Credit: INR ${totalCredit.toLocaleString()}`, 20, 52);
     doc.text(`Total Debit: INR ${totalDebit.toLocaleString()}`, 80, 52);
-    doc.text(`Net Balance: INR ${(totalCredit - totalDebit).toLocaleString()}`, 140, 52);
+    doc.text(`Net Revenue: INR ${totalRevenue.toLocaleString()}`, 140, 52);
 
     const tableRows = expenses.map(e => [
       e.date,
@@ -258,16 +259,27 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4 space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-[2rem] p-5 border border-[#e5e7eb] relative overflow-hidden">
-              <p className="text-[#6b7280] font-bold text-[10px] uppercase mb-1">Total Credit</p>
-              <h2 className="text-xl font-black text-green-600">₹{totalCredit.toLocaleString()}</h2>
-              <ArrowUpCircle className="absolute -bottom-2 -right-2 opacity-5 text-green-600" size={60}/>
+          <div className="flex flex-col gap-4">
+            {/* TOTAL REVENUE CARD */}
+            <div className={`rounded-[2rem] p-6 border transition-all shadow-sm relative overflow-hidden ${totalRevenue >= 0 ? 'bg-white border-[#e5e7eb]' : 'bg-red-50 border-red-200'}`}>
+              <p className="text-[#6b7280] font-bold text-[10px] uppercase mb-1">Total Net Revenue</p>
+              <h2 className={`text-3xl font-black ${totalRevenue >= 0 ? 'text-[#003087]' : 'text-red-600'}`}>
+                ₹{totalRevenue.toLocaleString()}
+              </h2>
+              <Wallet className={`absolute -bottom-2 -right-2 opacity-5 ${totalRevenue >= 0 ? 'text-[#003087]' : 'text-red-600'}`} size={80}/>
             </div>
-            <div className="bg-white rounded-[2rem] p-5 border border-[#e5e7eb] relative overflow-hidden">
-              <p className="text-[#6b7280] font-bold text-[10px] uppercase mb-1">Total Debit</p>
-              <h2 className="text-xl font-black text-red-600">₹{totalDebit.toLocaleString()}</h2>
-              <ArrowDownCircle className="absolute -bottom-2 -right-2 opacity-5 text-red-600" size={60}/>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-[2rem] p-5 border border-[#e5e7eb] relative overflow-hidden">
+                <p className="text-[#6b7280] font-bold text-[10px] uppercase mb-1">Total Credit</p>
+                <h2 className="text-xl font-black text-green-600">₹{totalCredit.toLocaleString()}</h2>
+                <ArrowUpCircle className="absolute -bottom-2 -right-2 opacity-5 text-green-600" size={60}/>
+              </div>
+              <div className="bg-white rounded-[2rem] p-5 border border-[#e5e7eb] relative overflow-hidden">
+                <p className="text-[#6b7280] font-bold text-[10px] uppercase mb-1">Total Debit</p>
+                <h2 className="text-xl font-black text-red-600">₹{totalDebit.toLocaleString()}</h2>
+                <ArrowDownCircle className="absolute -bottom-2 -right-2 opacity-5 text-red-600" size={60}/>
+              </div>
             </div>
           </div>
 
