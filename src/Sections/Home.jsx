@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { 
   Plus, Trash2, Download, FolderOpen, 
-  Search, Building2, Save, X, Eye, Paperclip, ArrowRightLeft, TrendingUp, Calendar,
-  ArrowUpCircle, ArrowDownCircle, FileJson, FileSpreadsheet, FileText, FileDown,
-  BarChart3
+  Search, Building2, Save, X, Eye, Paperclip, 
+  ArrowUpCircle, ArrowDownCircle, FileJson, FileSpreadsheet, 
+  FileDown, BarChart3, Calendar, FilePlus
 } from "lucide-react";
 
 // PDF & Chart Libraries
@@ -54,11 +54,25 @@ export default function Home() {
     localStorage.setItem("corp_ledger_v5", JSON.stringify({ expenses, categories }));
   }, [expenses, categories]);
 
+  // --- ACTIONS ---
+  const handleNewFile = () => {
+    const confirmNew = window.confirm("Create a new ledger? This will clear the current screen. Ensure you have exported your data if needed.");
+    if (confirmNew) {
+      setExpenses([]);
+      setActiveFileName("new_ledger_2026");
+      setForm({
+        description: "", amount: "", category: "Salary", 
+        date: new Date().toISOString().split('T')[0],
+        fromWhom: "", toWhom: "", billPhoto: "",
+        type: "debit" 
+      });
+    }
+  };
+
   // --- CALCULATIONS ---
   const totalDebit = expenses.filter(e => e.type === 'debit').reduce((sum, e) => sum + Number(e.amount), 0);
   const totalCredit = expenses.filter(e => e.type === 'credit').reduce((sum, e) => sum + Number(e.amount), 0);
 
-  // Prepare Data for Graph (Expenses only)
   const chartData = useMemo(() => {
     const dataMap = expenses
       .filter(e => e.type === 'debit')
@@ -140,6 +154,7 @@ export default function Home() {
         await writable.write(contentBlob);
         await writable.close();
         setShowSaveModal(false);
+        setActiveFileName(fileName);
         return;
       } catch (err) {
         if (err.name === 'AbortError') return;
@@ -152,6 +167,7 @@ export default function Home() {
     link.download = `${fileName}.${extension}`;
     link.click();
     setShowSaveModal(false);
+    setActiveFileName(fileName);
   };
 
   const handleImageUpload = (e) => {
@@ -210,19 +226,33 @@ export default function Home() {
           <div className="bg-[#003087] p-2 rounded-xl text-white"><Building2 size={24}/></div>
           <h1 className="text-2xl font-black italic text-[#6e6e6e]">EX<span className="text-[#e36f09]">SPOT</span></h1>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
+          {/* NEW BUTTON */}
+          <button onClick={handleNewFile} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-full font-bold text-sm transition-colors">
+            <Plus size={16}/> New
+          </button>
+          
           <input type="file" ref={fileInputRef} onChange={(e) => {
             const file = e.target.files[0];
+            if (!file) return;
             const reader = new FileReader();
             reader.onload = (event) => {
-              const data = JSON.parse(event.target.result);
-              setExpenses(data.expenses || []);
-              setActiveFileName(file.name.replace(".json", ""));
+              try {
+                const data = JSON.parse(event.target.result);
+                setExpenses(data.expenses || []);
+                setActiveFileName(file.name.replace(".json", ""));
+              } catch (err) { alert("Error loading file"); }
             };
             reader.readAsText(file);
           }} className="hidden" accept=".json" />
-          <button onClick={() => fileInputRef.current.click()} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#0070ba] text-[#0070ba] rounded-full font-bold text-sm"><FolderOpen size={16}/> Load</button>
-          <button onClick={() => { setTempFileName(activeFileName); setShowSaveModal(true); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#0070ba] text-white rounded-full font-bold text-sm shadow-md"><Download size={16}/> Export</button>
+          
+          <button onClick={() => fileInputRef.current.click()} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#0070ba] text-[#0070ba] rounded-full font-bold text-sm hover:bg-blue-50 transition-colors">
+            <FolderOpen size={16}/> Load
+          </button>
+          
+          <button onClick={() => { setTempFileName(activeFileName); setShowSaveModal(true); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#0070ba] text-white rounded-full font-bold text-sm shadow-md hover:bg-[#005a9e] transition-colors">
+            <Download size={16}/> Export
+          </button>
         </div>
       </nav>
 
