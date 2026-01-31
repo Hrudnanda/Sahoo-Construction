@@ -17,7 +17,8 @@ const DEFAULT_CATEGORIES = [
   "EVENT(Event expenses,Event day fuel,Event day fooding,Event other expenses)", 
   "Fuel on normal day", 
   "OFFICE(staionary,electric,recharges,rent,furniture,gadets)", 
-  "Other office expenses(recreational,birthdays,parties,puja etc)"
+  "Other office expenses(recreational,birthdays,parties,puja etc)",
+  "CREDIT"
 ];
 
 export default function Home() {
