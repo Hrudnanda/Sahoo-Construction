@@ -118,7 +118,7 @@ export default function Home() {
       startY: 70,
       head: [['Date', 'Type', 'Description', 'Category', 'Amount']],
       body: tableRows,
-      headStyles: { fillColor: [0, 112, 186] },
+      headStyles: { fillColor: [0, 185, 241] }, // Paytm Sky Blue
     });
 
     return doc.output('blob');
@@ -181,10 +181,10 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] font-sans text-[#2c2e2f] pb-20">
+    <div className="min-h-screen bg-[#F0F7FF] font-sans text-[#1D2F43] pb-20">
       {/* BILL PREVIEW MODAL */}
       {selectedBill && (
-        <div className="fixed inset-0 bg-black/80 z-[200] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setSelectedBill(null)}>
+        <div className="fixed inset-0 bg-[#002E6E]/90 z-[200] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setSelectedBill(null)}>
           <button className="absolute top-6 right-6 text-white bg-white/10 p-2 rounded-full"><X size={32}/></button>
           <img src={selectedBill} className="max-w-full max-h-[90vh] rounded-lg shadow-2xl" alt="Receipt" />
         </div>
@@ -192,28 +192,28 @@ export default function Home() {
 
       {/* SAVE MODAL */}
       {showSaveModal && (
-        <div className="fixed inset-0 bg-[#001c64]/40 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#002E6E]/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl">
-              <h3 className="text-xl font-black mb-6 text-[#003087] flex items-center gap-2"><Download size={20}/> Save Ledger</h3>
+              <h3 className="text-xl font-black mb-6 text-[#002E6E] flex items-center gap-2"><Download size={20}/> Save Ledger</h3>
               
               <label className="text-[10px] font-black uppercase text-[#9ca3af] mb-2 block">New File Name</label>
-              <input className="w-full bg-[#f5f7fa] border border-[#e5e7eb] p-4 rounded-2xl outline-none mb-6 font-bold focus:border-[#0070ba]"
+              <input className="w-full bg-[#f5f7fa] border border-[#e5e7eb] p-4 rounded-2xl outline-none mb-6 font-bold focus:border-[#00B9F1]"
                 value={tempFileName} placeholder="e.g. Office_Ledger_Jan" onChange={(e) => setTempFileName(e.target.value)} />
 
               <label className="text-[10px] font-black uppercase text-[#9ca3af] mb-2 block">Choose Format</label>
               <div className="grid grid-cols-3 gap-3 mb-8">
-                 <button onClick={() => setExportFormat("pdf")} className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${exportFormat === 'pdf' ? 'border-red-500 bg-red-50' : 'border-transparent bg-[#f5f7fa]'}`}>
+                 <button onClick={() => setExportFormat("pdf")} className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${exportFormat === 'pdf' ? 'border-[#00B9F1] bg-blue-50' : 'border-transparent bg-[#f5f7fa]'}`}>
                    <FileDown className="text-red-500" size={18}/> <span className="text-[10px] font-bold">PDF</span>
                  </button>
-                 <button onClick={() => setExportFormat("csv")} className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${exportFormat === 'csv' ? 'border-green-600 bg-green-50' : 'border-transparent bg-[#f5f7fa]'}`}>
+                 <button onClick={() => setExportFormat("csv")} className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${exportFormat === 'csv' ? 'border-[#00AC4E] bg-green-50' : 'border-transparent bg-[#f5f7fa]'}`}>
                    <FileSpreadsheet className="text-green-600" size={18}/> <span className="text-[10px] font-bold">CSV</span>
                  </button>
-                 <button onClick={() => setExportFormat("json")} className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${exportFormat === 'json' ? 'border-[#0070ba] bg-blue-50' : 'border-transparent bg-[#f5f7fa]'}`}>
-                   <FileJson className="text-blue-500" size={18}/> <span className="text-[10px] font-bold">JSON</span>
+                 <button onClick={() => setExportFormat("json")} className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${exportFormat === 'json' ? 'border-[#002E6E] bg-blue-50' : 'border-transparent bg-[#f5f7fa]'}`}>
+                   <FileJson className="text-[#002E6E]" size={18}/> <span className="text-[10px] font-bold">JSON</span>
                  </button>
               </div>
 
-              <button onClick={handleExport} className="w-full py-4 bg-[#003087] text-white rounded-full font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-[#002169]">
+              <button onClick={handleExport} className="w-full py-4 bg-[#00B9F1] text-white rounded-full font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-[#002E6E]">
                 <Save size={18}/> Select Save Location
               </button>
               <button onClick={() => setShowSaveModal(false)} className="w-full mt-4 text-[#6b7280] font-bold text-sm">Cancel</button>
@@ -221,15 +221,14 @@ export default function Home() {
         </div>
       )}
 
-      {/* NAVBAR */}
-      <nav className="bg-white border-b border-[#e5e7eb] px-6 py-4 mb-8 sticky top-0 z-40 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+      {/* NAVBAR - Paytm Gradient */}
+      <nav className="bg-gradient-to-r from-[#00B9F1] to-[#002E6E] px-6 py-4 mb-8 sticky top-0 z-40 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-3">
-          <div className="bg-[#003087] p-2 rounded-xl text-white"><Building2 size={24}/></div>
-          <h1 className="text-2xl font-black italic text-[#6e6e6e]">EX<span className="text-[#e36f09]">SPOT</span></h1>
+          <div className="bg-white p-2 rounded-xl text-[#002E6E] shadow-md"><Building2 size={24}/></div>
+          <h1 className="text-2xl font-black italic text-white">EX<span className="text-white/70">SPOT</span></h1>
         </div>
         <div className="flex gap-2">
-          {/* NEW BUTTON */}
-          <button onClick={handleNewFile} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-full font-bold text-sm transition-colors">
+          <button onClick={handleNewFile} className="flex items-center gap-2 px-5 py-2.5 bg-white/10 text-white hover:bg-white/20 rounded-full font-bold text-sm transition-colors backdrop-blur-md border border-white/20">
             <Plus size={16}/> New
           </button>
           
@@ -247,11 +246,11 @@ export default function Home() {
             reader.readAsText(file);
           }} className="hidden" accept=".json" />
           
-          <button onClick={() => fileInputRef.current.click()} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#0070ba] text-[#0070ba] rounded-full font-bold text-sm hover:bg-blue-50 transition-colors">
+          <button onClick={() => fileInputRef.current.click()} className="flex items-center gap-2 px-5 py-2.5 bg-white text-[#002E6E] rounded-full font-bold text-sm hover:bg-blue-50 transition-colors shadow-md">
             <FolderOpen size={16}/> Load
           </button>
           
-          <button onClick={() => { setTempFileName(activeFileName); setShowSaveModal(true); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#0070ba] text-white rounded-full font-bold text-sm shadow-md hover:bg-[#005a9e] transition-colors">
+          <button onClick={() => { setTempFileName(activeFileName); setShowSaveModal(true); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#002E6E] text-white rounded-full font-bold text-sm shadow-md border border-white/10 hover:bg-black transition-colors">
             <Download size={16}/> Export
           </button>
         </div>
@@ -260,72 +259,72 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4 space-y-6">
           <div className="flex flex-col gap-4">
-            {/* TOTAL REVENUE CARD */}
-            <div className={`rounded-[2rem] p-6 border transition-all shadow-sm relative overflow-hidden ${totalRevenue >= 0 ? 'bg-white border-[#e5e7eb]' : 'bg-red-50 border-red-200'}`}>
-              <p className="text-[#6b7280] font-bold text-[10px] uppercase mb-1">Total Net Revenue</p>
-              <h2 className={`text-3xl font-black ${totalRevenue >= 0 ? 'text-[#003087]' : 'text-red-600'}`}>
+            {/* TOTAL REVENUE CARD - Paytm Gradient */}
+            <div className={`rounded-[2rem] p-8 border transition-all shadow-xl relative overflow-hidden text-white ${totalRevenue >= 0 ? 'bg-gradient-to-br from-[#00B9F1] to-[#002E6E]' : 'bg-red-500'}`}>
+              <p className="text-white/70 font-bold text-[10px] uppercase mb-1 tracking-widest">Total Net Revenue</p>
+              <h2 className="text-4xl font-black">
                 ₹{totalRevenue.toLocaleString()}
               </h2>
-              <Wallet className={`absolute -bottom-2 -right-2 opacity-5 ${totalRevenue >= 0 ? 'text-[#003087]' : 'text-red-600'}`} size={80}/>
+              <Wallet className="absolute -bottom-4 -right-4 opacity-10" size={100}/>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-[2rem] p-5 border border-[#e5e7eb] relative overflow-hidden">
+              <div className="bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm relative overflow-hidden">
                 <p className="text-[#6b7280] font-bold text-[10px] uppercase mb-1">Total Credit</p>
-                <h2 className="text-xl font-black text-green-600">₹{totalCredit.toLocaleString()}</h2>
-                <ArrowUpCircle className="absolute -bottom-2 -right-2 opacity-5 text-green-600" size={60}/>
+                <h2 className="text-xl font-black text-[#00AC4E]">₹{totalCredit.toLocaleString()}</h2>
+                <ArrowUpCircle className="absolute -bottom-2 -right-2 opacity-5 text-[#00AC4E]" size={60}/>
               </div>
-              <div className="bg-white rounded-[2rem] p-5 border border-[#e5e7eb] relative overflow-hidden">
+              <div className="bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm relative overflow-hidden">
                 <p className="text-[#6b7280] font-bold text-[10px] uppercase mb-1">Total Debit</p>
-                <h2 className="text-xl font-black text-red-600">₹{totalDebit.toLocaleString()}</h2>
-                <ArrowDownCircle className="absolute -bottom-2 -right-2 opacity-5 text-red-600" size={60}/>
+                <h2 className="text-xl font-black text-red-500">₹{totalDebit.toLocaleString()}</h2>
+                <ArrowDownCircle className="absolute -bottom-2 -right-2 opacity-5 text-red-500" size={60}/>
               </div>
             </div>
           </div>
 
           {/* GRAPH */}
-          <div className="bg-white rounded-[2.5rem] p-6 border border-[#e5e7eb] shadow-sm">
-            <h3 className="font-bold text-[#003087] text-sm mb-4 flex items-center gap-2"><BarChart3 size={16}/> Top Spending Categories</h3>
+          <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm">
+            <h3 className="font-bold text-[#002E6E] text-sm mb-4 flex items-center gap-2"><BarChart3 size={16}/> Spending Analysis</h3>
             <div className="h-48 w-full">
               {chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                  <BarChart data={chartData}>
                     <XAxis dataKey="name" hide />
                     <YAxis hide />
-                    <Tooltip cursor={{fill: '#f5f7fa'}} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px', fontWeight: 'bold' }} />
+                    <Tooltip cursor={{fill: '#f0f7ff'}} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px', fontWeight: 'bold' }} />
                     <Bar dataKey="amount" radius={[6, 6, 6, 6]} barSize={30}>
                       {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index === 0 ? '#ef4444' : '#0070ba'} />
+                        <Cell key={`cell-${index}`} fill={index === 0 ? '#ef4444' : '#00B9F1'} />
                       ))}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-full flex items-center justify-center text-gray-400 text-xs italic">Add debits to see chart</div>
+                <div className="h-full flex items-center justify-center text-gray-400 text-xs italic">No data yet</div>
               )}
             </div>
           </div>
 
           {/* FORM */}
-          <div className="bg-white rounded-[2.5rem] p-6 border border-[#e5e7eb] shadow-sm space-y-4">
-            <h3 className="font-bold text-[#003087]">New Transaction</h3>
+          <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-xl space-y-4">
+            <h3 className="font-bold text-[#002E6E]">New Transaction</h3>
             <div className="flex bg-[#f5f7fa] p-1 rounded-xl">
               <button onClick={() => setForm({...form, type: 'debit'})} className={`flex-1 py-2 rounded-lg text-xs font-black transition-all ${form.type === 'debit' ? 'bg-red-500 text-white shadow-md' : 'text-[#6b7280]'}`}>DEBIT</button>
-              <button onClick={() => setForm({...form, type: 'credit'})} className={`flex-1 py-2 rounded-lg text-xs font-black transition-all ${form.type === 'credit' ? 'bg-green-500 text-white shadow-md' : 'text-[#6b7280]'}`}>CREDIT</button>
+              <button onClick={() => setForm({...form, type: 'credit'})} className={`flex-1 py-2 rounded-lg text-xs font-black transition-all ${form.type === 'credit' ? 'bg-[#00AC4E] text-white shadow-md' : 'text-[#6b7280]'}`}>CREDIT</button>
             </div>
-            <input placeholder="Description" className="w-full p-4 bg-[#f5f7fa] border border-[#e5e7eb] rounded-2xl outline-none focus:border-[#0070ba]" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+            <input placeholder="Description" className="w-full p-4 bg-[#F0F7FF] rounded-2xl outline-none focus:border-[#00B9F1] border border-transparent" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
             <div className="grid grid-cols-2 gap-3">
-               <input placeholder="Sender" className="p-3 bg-[#f5f7fa] border border-[#e5e7eb] rounded-xl text-sm" value={form.fromWhom} onChange={e => setForm({...form, fromWhom: e.target.value})} />
-               <input placeholder="Receiver" className="p-3 bg-[#f5f7fa] border border-[#e5e7eb] rounded-xl text-sm" value={form.toWhom} onChange={e => setForm({...form, toWhom: e.target.value})} />
+               <input placeholder="Sender" className="p-3 bg-[#F0F7FF] rounded-xl text-sm" value={form.fromWhom} onChange={e => setForm({...form, fromWhom: e.target.value})} />
+               <input placeholder="Receiver" className="p-3 bg-[#F0F7FF] rounded-xl text-sm" value={form.toWhom} onChange={e => setForm({...form, toWhom: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <input type="number" placeholder="Amount" className="p-3 bg-[#f5f7fa] border border-[#e5e7eb] rounded-xl font-bold" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} />
-              <select className="p-3 bg-[#f5f7fa] border border-[#e5e7eb] rounded-xl text-xs font-bold" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
+              <input type="number" placeholder="Amount" className="p-3 bg-[#F0F7FF] rounded-xl font-bold" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} />
+              <select className="p-3 bg-[#F0F7FF] rounded-xl text-xs font-bold" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
                 {categories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
-            <input type="date" className="w-full p-3 bg-[#f5f7fa] border border-[#e5e7eb] rounded-xl text-xs font-bold" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
-            <label className="flex items-center justify-center gap-2 w-full p-4 bg-[#f0f7fd] text-[#0070ba] border-2 border-dashed border-[#0070ba]/30 rounded-2xl cursor-pointer font-bold text-xs uppercase">
+            <input type="date" className="w-full p-3 bg-[#F0F7FF] rounded-xl text-xs font-bold" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
+            <label className="flex items-center justify-center gap-2 w-full p-4 bg-white text-[#00B9F1] border-2 border-dashed border-[#00B9F1]/30 rounded-2xl cursor-pointer font-bold text-xs uppercase hover:bg-blue-50">
               <Paperclip size={16}/> {form.billPhoto ? "Proof Attached ✅" : "Attach Receipt"}
               <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
             </label>
@@ -333,16 +332,16 @@ export default function Home() {
               if(!form.description || !form.amount) return alert("Fill required fields");
               setExpenses([{...form, id: Date.now(), amount: Number(form.amount)}, ...expenses]);
               setForm({...form, description: "", amount: "", fromWhom: "", toWhom: "", billPhoto: ""});
-            }} className={`w-full py-4 text-white rounded-full font-bold shadow-lg transition-all ${form.type === 'credit' ? 'bg-green-600' : 'bg-red-500'}`}>
-              Save {form.type.toUpperCase()}
+            }} className={`w-full py-4 text-white rounded-full font-bold shadow-lg transition-all ${form.type === 'credit' ? 'bg-[#00AC4E]' : 'bg-red-500'}`}>
+              Proceed to {form.type.toUpperCase()}
             </button>
           </div>
         </div>
 
         {/* LIST */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-white rounded-[2.5rem] border border-[#e5e7eb] shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-[#f5f7fa] flex items-center gap-4 bg-[#fcfdfe]">
+          <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-md overflow-hidden">
+            <div className="p-5 border-b border-slate-50 flex items-center gap-4 bg-[#fcfdfe]">
               <Search className="text-[#9ca3af]" size={20} />
               <input placeholder="Search transactions..." className="bg-transparent outline-none w-full font-medium text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
@@ -350,28 +349,28 @@ export default function Home() {
               <table className="w-full text-left border-separate border-spacing-y-3">
                 <tbody>
                   {expenses.filter(e => e.description.toLowerCase().includes(searchTerm.toLowerCase())).map(e => (
-                    <tr key={e.id} className="bg-white hover:shadow-sm transition-all">
-                      <td className="px-5 py-4 rounded-l-2xl border-y border-l border-[#f1f5f9]">
-                        <div className="font-bold text-sm text-[#003087]">{e.description}</div>
+                    <tr key={e.id} className="bg-white hover:shadow-md transition-all">
+                      <td className="px-5 py-4 rounded-l-2xl border-y border-l border-slate-50">
+                        <div className="font-bold text-sm text-[#002E6E]">{e.description}</div>
                         <div className="text-[10px] text-[#6b7280] font-bold mt-1 uppercase flex items-center gap-2">
                            <Calendar size={10}/> {e.date} | {e.fromWhom} → {e.toWhom}
                         </div>
                       </td>
-                      <td className="px-5 py-4 border-y border-[#f1f5f9] text-right">
-                        <div className={`font-black text-md ${e.type === 'credit' ? 'text-green-600' : 'text-red-500'}`}>
+                      <td className="px-5 py-4 border-y border-slate-50 text-right">
+                        <div className={`font-black text-md ${e.type === 'credit' ? 'text-[#00AC4E]' : 'text-red-500'}`}>
                           {e.type === 'credit' ? '+' : '-'}₹{Number(e.amount).toLocaleString()}
                         </div>
-                        <div className="text-[10px] text-[#0070ba] font-bold uppercase">{e.category}</div>
+                        <div className="text-[10px] text-[#00B9F1] font-bold uppercase">{e.category}</div>
                       </td>
-                      <td className="px-5 py-4 rounded-r-2xl border-y border-r border-[#f1f5f9] text-right space-x-1">
-                        {e.billPhoto && <button onClick={() => setSelectedBill(e.billPhoto)} className="p-2 text-[#0070ba] hover:bg-blue-50 rounded-full"><Eye size={18}/></button>}
-                        <button onClick={() => setExpenses(expenses.filter(i => i.id !== e.id))} className="p-2 text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
+                      <td className="px-5 py-4 rounded-r-2xl border-y border-r border-slate-50 text-right space-x-1">
+                        {e.billPhoto && <button onClick={() => setSelectedBill(e.billPhoto)} className="p-2 text-[#00B9F1] hover:bg-blue-50 rounded-full"><Eye size={18}/></button>}
+                        <button onClick={() => setExpenses(expenses.filter(i => i.id !== e.id))} className="p-2 text-slate-200 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              {expenses.length === 0 && <div className="text-center py-20 text-gray-400 italic font-medium">No records found. Start adding transactions.</div>}
+              {expenses.length === 0 && <div className="text-center py-20 text-slate-300 italic font-medium">Safe & Secure Transactions</div>}
             </div>
           </div>
         </div>
