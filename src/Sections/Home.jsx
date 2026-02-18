@@ -3,7 +3,7 @@ import {
   Plus, Trash2, Download, FolderOpen, 
   Search, Building2, Save, X, Eye, Paperclip, 
   ArrowUpCircle, ArrowDownCircle, FileJson, FileSpreadsheet, 
-  FileDown, BarChart3, Calendar, Wallet
+  FileDown, BarChart3, Calendar, Wallet, Pencil
 } from "lucide-react";
 
 // PDF & Chart Libraries
@@ -12,12 +12,15 @@ import autoTable from "jspdf-autotable";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const DEFAULT_CATEGORIES = [
-  "Mess expenses", 
+  "Mess expenses office(vegetable,Grocery etc)", 
+  "Mess expenses Godam(veg,Gas,Grocery etc)", 
+  "Godam Exenses(Rent,Electric bill,Recharge,Fuel)", 
   "Salary", 
   "EVENT(Event expenses,Event day fuel,Event day fooding,Event other expenses)", 
   "Fuel on normal day", 
   "OFFICE(staionary,electric,recharges,rent,furniture,gadets)", 
   "Other office expenses(recreational,birthdays,parties,puja etc)",
+  "personal",
   "CREDIT"
 ];
 
@@ -30,6 +33,7 @@ export default function Home() {
   const [tempFileName, setTempFileName] = useState("");
   const [exportFormat, setExportFormat] = useState("pdf"); 
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingId, setEditingId] = useState(null); // TRACKS IF WE ARE EDITING
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
@@ -59,6 +63,7 @@ export default function Home() {
     const confirmNew = window.confirm("Create a new ledger? This will clear the current screen. Ensure you have exported your data if needed.");
     if (confirmNew) {
       setExpenses([]);
+      setEditingId(null);
       setActiveFileName("new_ledger_2026");
       setForm({
         description: "", amount: "", category: "Salary", 
@@ -67,6 +72,32 @@ export default function Home() {
         type: "debit" 
       });
     }
+  };
+
+  const handleEdit = (expense) => {
+    setEditingId(expense.id);
+    setForm({ ...expense });
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to form
+  };
+
+  const handleSubmit = () => {
+    if(!form.description || !form.amount) return alert("Fill required fields");
+    
+    if (editingId) {
+      // UPDATE EXISTING
+      setExpenses(expenses.map(e => e.id === editingId ? { ...form, amount: Number(form.amount) } : e));
+      setEditingId(null);
+    } else {
+      // ADD NEW
+      setExpenses([{...form, id: Date.now(), amount: Number(form.amount)}, ...expenses]);
+    }
+
+    setForm({
+        description: "", amount: "", category: "Salary", 
+        date: new Date().toISOString().split('T')[0],
+        fromWhom: "", toWhom: "", billPhoto: "",
+        type: "debit" 
+    });
   };
 
   // --- CALCULATIONS ---
@@ -221,7 +252,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* NAVBAR - Paytm Gradient */}
+      {/* NAVBAR */}
       <nav className="bg-gradient-to-r from-[#00B9F1] to-[#002E6E] px-6 py-4 mb-8 sticky top-0 z-40 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-3">
           <div className="bg-white p-2 rounded-xl text-[#002E6E] shadow-md"><Building2 size={24}/></div>
@@ -259,7 +290,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4 space-y-6">
           <div className="flex flex-col gap-4">
-            {/* TOTAL REVENUE CARD - Paytm Gradient */}
+            {/* TOTAL REVENUE CARD */}
             <div className={`rounded-[2rem] p-8 border transition-all shadow-xl relative overflow-hidden text-white ${totalRevenue >= 0 ? 'bg-gradient-to-br from-[#00B9F1] to-[#002E6E]' : 'bg-red-500'}`}>
               <p className="text-white/70 font-bold text-[10px] uppercase mb-1 tracking-widest">Total Net Revenue</p>
               <h2 className="text-4xl font-black">
@@ -307,15 +338,28 @@ export default function Home() {
 
           {/* FORM */}
           <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-xl space-y-4">
-            <h3 className="font-bold text-[#002E6E]">New Transaction</h3>
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-[#002E6E]">{editingId ? "Edit Transaction" : "New Transaction"}</h3>
+              {editingId && (
+                <button 
+                  onClick={() => {
+                    setEditingId(null);
+                    setForm({description: "", amount: "", category: "Salary", date: new Date().toISOString().split('T')[0], fromWhom: "", toWhom: "", billPhoto: "", type: "debit"});
+                  }}
+                  className="text-[10px] font-bold text-red-500 underline"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
             <div className="flex bg-[#f5f7fa] p-1 rounded-xl">
               <button onClick={() => setForm({...form, type: 'debit'})} className={`flex-1 py-2 rounded-lg text-xs font-black transition-all ${form.type === 'debit' ? 'bg-red-500 text-white shadow-md' : 'text-[#6b7280]'}`}>DEBIT</button>
               <button onClick={() => setForm({...form, type: 'credit'})} className={`flex-1 py-2 rounded-lg text-xs font-black transition-all ${form.type === 'credit' ? 'bg-[#00AC4E] text-white shadow-md' : 'text-[#6b7280]'}`}>CREDIT</button>
             </div>
             <input placeholder="Description" className="w-full p-4 bg-[#F0F7FF] rounded-2xl outline-none focus:border-[#00B9F1] border border-transparent" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
             <div className="grid grid-cols-2 gap-3">
-               <input placeholder="Sender" className="p-3 bg-[#F0F7FF] rounded-xl text-sm" value={form.fromWhom} onChange={e => setForm({...form, fromWhom: e.target.value})} />
-               <input placeholder="Receiver" className="p-3 bg-[#F0F7FF] rounded-xl text-sm" value={form.toWhom} onChange={e => setForm({...form, toWhom: e.target.value})} />
+                <input placeholder="Sender" className="p-3 bg-[#F0F7FF] rounded-xl text-sm" value={form.fromWhom} onChange={e => setForm({...form, fromWhom: e.target.value})} />
+                <input placeholder="Receiver" className="p-3 bg-[#F0F7FF] rounded-xl text-sm" value={form.toWhom} onChange={e => setForm({...form, toWhom: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <input type="number" placeholder="Amount" className="p-3 bg-[#F0F7FF] rounded-xl font-bold" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} />
@@ -328,12 +372,11 @@ export default function Home() {
               <Paperclip size={16}/> {form.billPhoto ? "Proof Attached ✅" : "Attach Receipt"}
               <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
             </label>
-            <button onClick={() => {
-              if(!form.description || !form.amount) return alert("Fill required fields");
-              setExpenses([{...form, id: Date.now(), amount: Number(form.amount)}, ...expenses]);
-              setForm({...form, description: "", amount: "", fromWhom: "", toWhom: "", billPhoto: ""});
-            }} className={`w-full py-4 text-white rounded-full font-bold shadow-lg transition-all ${form.type === 'credit' ? 'bg-[#00AC4E]' : 'bg-red-500'}`}>
-              Proceed to {form.type.toUpperCase()}
+            <button 
+              onClick={handleSubmit} 
+              className={`w-full py-4 text-white rounded-full font-bold shadow-lg transition-all ${form.type === 'credit' ? 'bg-[#00AC4E]' : 'bg-red-500'}`}
+            >
+              {editingId ? "Update Transaction" : `Proceed to ${form.type.toUpperCase()}`}
             </button>
           </div>
         </div>
@@ -349,7 +392,7 @@ export default function Home() {
               <table className="w-full text-left border-separate border-spacing-y-3">
                 <tbody>
                   {expenses.filter(e => e.description.toLowerCase().includes(searchTerm.toLowerCase())).map(e => (
-                    <tr key={e.id} className="bg-white hover:shadow-md transition-all">
+                    <tr key={e.id} className={`bg-white hover:shadow-md transition-all ${editingId === e.id ? 'ring-2 ring-[#00B9F1]' : ''}`}>
                       <td className="px-5 py-4 rounded-l-2xl border-y border-l border-slate-50">
                         <div className="font-bold text-sm text-[#002E6E]">{e.description}</div>
                         <div className="text-[10px] text-[#6b7280] font-bold mt-1 uppercase flex items-center gap-2">
@@ -364,6 +407,7 @@ export default function Home() {
                       </td>
                       <td className="px-5 py-4 rounded-r-2xl border-y border-r border-slate-50 text-right space-x-1">
                         {e.billPhoto && <button onClick={() => setSelectedBill(e.billPhoto)} className="p-2 text-[#00B9F1] hover:bg-blue-50 rounded-full"><Eye size={18}/></button>}
+                        <button onClick={() => handleEdit(e)} className="p-2 text-[#00B9F1] hover:bg-blue-50 rounded-full transition-colors"><Pencil size={18}/></button>
                         <button onClick={() => setExpenses(expenses.filter(i => i.id !== e.id))} className="p-2 text-slate-200 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
                       </td>
                     </tr>
