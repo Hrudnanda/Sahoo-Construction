@@ -16,6 +16,7 @@ const DEFAULT_CATEGORIES = [
   "Mess expenses Godam(veg,Gas,Grocery etc)", 
   "Godam Exenses(Rent,Electric bill,Recharge,Fuel)", 
   "Salary", 
+  "Vendor payment ", 
   "EVENT(Event expenses,Event day fuel,Event day fooding,Event other expenses)", 
   "Fuel on normal day", 
   "OFFICE(staionary,electric,recharges,rent,furniture,gadets)", 
@@ -325,7 +326,7 @@ export default function Home() {
                     <Tooltip cursor={{fill: '#f0f7ff'}} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px', fontWeight: 'bold' }} />
                     <Bar dataKey="amount" radius={[6, 6, 6, 6]} barSize={30}>
                       {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index === 0 ? '#ef4444' : '#00B9F1'} />
+                        <Cell key={`cell-${index}`} fill={index === 0 ? '#fc0563' : '#00B9F1'} />
                       ))}
                     </Bar>
                   </BarChart>
