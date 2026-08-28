@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 const PASSWORD_KEY = "exspot_security_password";
+const PASSWORD_BACKUP_KEY = "exspot_security_password_backup";
 const LOCK_TIME_KEY = "exspot_auto_lock_time";
 
 // --------------------------------------------------
@@ -16,6 +17,41 @@ const LOCK_TIME_KEY = "exspot_auto_lock_time";
 // --------------------------------------------------
 
 const DEFAULT_PASSWORD = "1234";
+
+const normalizePassword = (value) =>
+  typeof value === "string" ? value.trim() : "";
+
+const readStoredPassword = () => {
+  try {
+    const primary = normalizePassword(localStorage.getItem(PASSWORD_KEY));
+    const backup = normalizePassword(
+      localStorage.getItem(PASSWORD_BACKUP_KEY)
+    );
+
+    // Recover from the backup if the primary value is missing/corrupted.
+    if (primary) return primary;
+
+    if (backup) {
+      localStorage.setItem(PASSWORD_KEY, backup);
+      return backup;
+    }
+
+    return DEFAULT_PASSWORD;
+  } catch {
+    return DEFAULT_PASSWORD;
+  }
+};
+
+const saveStoredPassword = (value) => {
+  const safePassword = normalizePassword(value);
+
+  try {
+    localStorage.setItem(PASSWORD_KEY, safePassword);
+    localStorage.setItem(PASSWORD_BACKUP_KEY, safePassword);
+  } catch {
+    // Keep the in-memory password working even if browser storage is unavailable.
+  }
+};
 
 // --------------------------------------------------
 // DEVELOPER MASTER PASSWORD
@@ -47,15 +83,34 @@ export default function Security({ children }) {
 
   const [password, setPassword] = useState("");
 
-  const [savedPassword, setSavedPassword] = useState(
-    localStorage.getItem(PASSWORD_KEY) || DEFAULT_PASSWORD
-  );
+  const [savedPassword, setSavedPassword] = useState(readStoredPassword);
 
   const [isLocked, setIsLocked] = useState(true);
 
   const [showPassword, setShowPassword] = useState(false);
 
   const [showChangePassword, setShowChangePassword] =
+    useState(false);
+
+  const [showForgotPassword, setShowForgotPassword] =
+    useState(false);
+
+  const [masterPassword, setMasterPassword] =
+    useState("");
+
+  const [resetPassword, setResetPassword] =
+    useState("");
+
+  const [confirmResetPassword, setConfirmResetPassword] =
+    useState("");
+
+  const [showMasterPassword, setShowMasterPassword] =
+    useState(false);
+
+  const [showResetPassword, setShowResetPassword] =
+    useState(false);
+
+  const [showConfirmResetPassword, setShowConfirmResetPassword] =
     useState(false);
 
   const [currentPassword, setCurrentPassword] =
@@ -100,10 +155,14 @@ export default function Security({ children }) {
 
   const updateActivity = () => {
     if (!isLocked) {
-      localStorage.setItem(
-        LOCK_TIME_KEY,
-        Date.now().toString()
-      );
+      try {
+        localStorage.setItem(
+          LOCK_TIME_KEY,
+          Date.now().toString()
+        );
+      } catch {
+        // Ignore storage errors.
+      }
     }
   };
 
@@ -183,23 +242,55 @@ export default function Security({ children }) {
   }, [isLocked]);
 
   // --------------------------------------------------
+  // KEEP PASSWORD IN SYNC WITH BROWSER STORAGE
+  // --------------------------------------------------
+
+  useEffect(() => {
+    const syncPassword = () => {
+      const latest = readStoredPassword();
+      setSavedPassword(latest);
+    };
+
+    window.addEventListener("storage", syncPassword);
+
+    return () => {
+      window.removeEventListener("storage", syncPassword);
+    };
+  }, []);
+
+  // --------------------------------------------------
   // UNLOCK SOFTWARE
   // --------------------------------------------------
 
   const handleUnlock = () => {
+    // Always read the latest password from storage.
+    // This prevents an old React state value from causing
+    // "Incorrect password" after the app has been open for a long time.
+    const latestSavedPassword = readStoredPassword();
+
+    if (latestSavedPassword !== savedPassword) {
+      setSavedPassword(latestSavedPassword);
+    }
+
+    const enteredPassword = normalizePassword(password);
+
     // -----------------------------------------------
     // DEVELOPER MASTER PASSWORD
     // -----------------------------------------------
 
-    if (password === DEVELOPER_PASSWORD) {
+    if (enteredPassword === DEVELOPER_PASSWORD) {
       setIsLocked(false);
       setPassword("");
       setError("");
 
-      localStorage.setItem(
-        LOCK_TIME_KEY,
-        Date.now().toString()
-      );
+      try {
+        localStorage.setItem(
+          LOCK_TIME_KEY,
+          Date.now().toString()
+        );
+      } catch {
+        // Ignore storage errors.
+      }
 
       return;
     }
@@ -208,15 +299,19 @@ export default function Security({ children }) {
     // NORMAL USER PASSWORD
     // -----------------------------------------------
 
-    if (password === savedPassword) {
+    if (enteredPassword === latestSavedPassword) {
       setIsLocked(false);
       setPassword("");
       setError("");
 
-      localStorage.setItem(
-        LOCK_TIME_KEY,
-        Date.now().toString()
-      );
+      try {
+        localStorage.setItem(
+          LOCK_TIME_KEY,
+          Date.now().toString()
+        );
+      } catch {
+        // Ignore storage errors.
+      }
     } else {
       setError("Incorrect password");
       setPassword("");
@@ -231,8 +326,70 @@ export default function Security({ children }) {
     setIsLocked(true);
     setPassword("");
 
-    localStorage.removeItem(
-      LOCK_TIME_KEY
+    try {
+      localStorage.removeItem(LOCK_TIME_KEY);
+    } catch {
+      // Ignore storage errors.
+    }
+  };
+
+  // --------------------------------------------------
+  // FORGOT PASSWORD / MASTER PASSWORD RESET
+  // --------------------------------------------------
+
+  const handleMasterPasswordReset = () => {
+    setError("");
+
+    const enteredMasterPassword =
+      normalizePassword(masterPassword);
+    const enteredResetPassword =
+      normalizePassword(resetPassword);
+    const enteredConfirmResetPassword =
+      normalizePassword(confirmResetPassword);
+
+    if (
+      !enteredMasterPassword ||
+      !enteredResetPassword ||
+      !enteredConfirmResetPassword
+    ) {
+      setError("Please fill all fields.");
+      return;
+    }
+
+    // Only the developer/master password can reset a forgotten user password.
+    if (enteredMasterPassword !== DEVELOPER_PASSWORD) {
+      setError("Master password is incorrect.");
+      setMasterPassword("");
+      return;
+    }
+
+    if (enteredResetPassword.length < 4) {
+      setError(
+        "New password must be at least 4 characters."
+      );
+      return;
+    }
+
+    if (
+      enteredResetPassword !==
+      enteredConfirmResetPassword
+    ) {
+      setError("New passwords do not match.");
+      return;
+    }
+
+    // Save to both primary and backup storage.
+    saveStoredPassword(enteredResetPassword);
+    setSavedPassword(enteredResetPassword);
+
+    setMasterPassword("");
+    setResetPassword("");
+    setConfirmResetPassword("");
+    setShowForgotPassword(false);
+    setError("");
+
+    alert(
+      "Password reset successfully. You can now login with your new password."
     );
   };
 
@@ -243,11 +400,16 @@ export default function Security({ children }) {
   const handleChangePassword = () => {
     setError("");
 
+    const latestSavedPassword = readStoredPassword();
+    const enteredCurrentPassword = normalizePassword(currentPassword);
+    const enteredNewPassword = normalizePassword(newPassword);
+    const enteredConfirmPassword = normalizePassword(confirmPassword);
+
     // Check empty fields
     if (
-      !currentPassword ||
-      !newPassword ||
-      !confirmPassword
+      !enteredCurrentPassword ||
+      !enteredNewPassword ||
+      !enteredConfirmPassword
     ) {
       setError(
         "Please fill all fields."
@@ -259,7 +421,7 @@ export default function Security({ children }) {
     // Developer password cannot be changed
     // through the normal user password screen.
     if (
-      currentPassword ===
+      enteredCurrentPassword ===
       DEVELOPER_PASSWORD
     ) {
       setError(
@@ -271,8 +433,8 @@ export default function Security({ children }) {
 
     // Check current user password
     if (
-      currentPassword !==
-      savedPassword
+      enteredCurrentPassword !==
+      latestSavedPassword
     ) {
       setError(
         "Current password is incorrect."
@@ -282,7 +444,7 @@ export default function Security({ children }) {
     }
 
     // Minimum password length
-    if (newPassword.length < 4) {
+    if (enteredNewPassword.length < 4) {
       setError(
         "New password must be at least 4 characters."
       );
@@ -292,8 +454,8 @@ export default function Security({ children }) {
 
     // Confirm password
     if (
-      newPassword !==
-      confirmPassword
+      enteredNewPassword !==
+      enteredConfirmPassword
     ) {
       setError(
         "New passwords do not match."
@@ -303,12 +465,8 @@ export default function Security({ children }) {
     }
 
     // Save new password
-    localStorage.setItem(
-      PASSWORD_KEY,
-      newPassword
-    );
-
-    setSavedPassword(newPassword);
+    saveStoredPassword(enteredNewPassword);
+    setSavedPassword(enteredNewPassword);
 
     // Clear fields
     setCurrentPassword("");
@@ -482,17 +640,27 @@ export default function Security({ children }) {
 
             <button
               onClick={() => {
-                setShowChangePassword(
-                  true
-                );
-
+                setShowChangePassword(true);
+                setShowForgotPassword(false);
                 setError("");
               }}
               className="w-full mt-5 text-xs font-bold text-[#002E6E] hover:text-[#00B9F1]"
             >
-
               Change Password
+            </button>
 
+            <button
+              onClick={() => {
+                setShowForgotPassword(true);
+                setShowChangePassword(false);
+                setMasterPassword("");
+                setResetPassword("");
+                setConfirmResetPassword("");
+                setError("");
+              }}
+              className="w-full mt-3 text-xs font-bold text-gray-500 hover:text-[#00B9F1]"
+            >
+              Forgot Password? Reset with Master Password
             </button>
 
             {/* ------------------------------------------------
@@ -510,6 +678,156 @@ export default function Security({ children }) {
           </div>
 
         </div>
+
+        {/* --------------------------------------------------
+            FORGOT PASSWORD / MASTER RESET MODAL
+        -------------------------------------------------- */}
+
+        {showForgotPassword && (
+          <div className="fixed inset-0 bg-[#002E6E]/70 backdrop-blur-sm flex items-center justify-center p-4 z-[600]">
+            <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-md shadow-2xl">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center">
+                  <KeyRound
+                    size={24}
+                    className="text-[#002E6E]"
+                  />
+                </div>
+
+                <div>
+                  <h2 className="font-black text-[#002E6E] text-lg">
+                    Reset Forgotten Password
+                  </h2>
+
+                  <p className="text-xs text-gray-400">
+                    Use your master password to create a new password
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative mb-3">
+                <input
+                  type={showMasterPassword ? "text" : "password"}
+                  placeholder="Master Password"
+                  value={masterPassword}
+                  onChange={(e) => {
+                    setMasterPassword(e.target.value);
+                    setError("");
+                  }}
+                  className="w-full p-4 pr-12 bg-[#F0F7FF] rounded-2xl outline-none border border-transparent focus:border-[#00B9F1]"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowMasterPassword(!showMasterPassword)
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                >
+                  {showMasterPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
+
+              <div className="relative mb-3">
+                <input
+                  type={showResetPassword ? "text" : "password"}
+                  placeholder="New Password"
+                  value={resetPassword}
+                  onChange={(e) => {
+                    setResetPassword(e.target.value);
+                    setError("");
+                  }}
+                  className="w-full p-4 pr-12 bg-[#F0F7FF] rounded-2xl outline-none border border-transparent focus:border-[#00B9F1]"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowResetPassword(!showResetPassword)
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                >
+                  {showResetPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
+
+              <div className="relative mb-4">
+                <input
+                  type={
+                    showConfirmResetPassword
+                      ? "text"
+                      : "password"
+                  }
+                  placeholder="Confirm New Password"
+                  value={confirmResetPassword}
+                  onChange={(e) => {
+                    setConfirmResetPassword(e.target.value);
+                    setError("");
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleMasterPasswordReset();
+                    }
+                  }}
+                  className="w-full p-4 pr-12 bg-[#F0F7FF] rounded-2xl outline-none border border-transparent focus:border-[#00B9F1]"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmResetPassword(
+                      !showConfirmResetPassword
+                    )
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                >
+                  {showConfirmResetPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
+
+              {error && (
+                <p className="text-red-500 text-xs font-bold mb-4 text-center">
+                  {error}
+                </p>
+              )}
+
+              <button
+                onClick={handleMasterPasswordReset}
+                className="w-full py-4 bg-gradient-to-r from-[#00B9F1] to-[#002E6E] text-white rounded-full font-bold shadow-lg"
+              >
+                Reset Password
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setMasterPassword("");
+                  setResetPassword("");
+                  setConfirmResetPassword("");
+                  setError("");
+                  setShowMasterPassword(false);
+                  setShowResetPassword(false);
+                  setShowConfirmResetPassword(false);
+                }}
+                className="w-full mt-4 text-sm font-bold text-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* --------------------------------------------------
             CHANGE PASSWORD MODAL
@@ -627,6 +945,9 @@ export default function Security({ children }) {
                   setNewPassword("");
                   setConfirmPassword("");
                   setError("");
+                  setShowMasterPassword(false);
+                  setShowResetPassword(false);
+                  setShowConfirmResetPassword(false);
                 }}
                 className="w-full mt-4 text-sm font-bold text-gray-400"
               >
